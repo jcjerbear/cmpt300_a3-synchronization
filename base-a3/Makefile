@@ -1,4 +1,4 @@
-CFLAGS=
+CFLAGS= -std=gnu99
 CC=gcc $(CFLAGS)
 OBJECTS=sync.o main.o
 
