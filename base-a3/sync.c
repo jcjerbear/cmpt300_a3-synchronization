@@ -5,7 +5,8 @@
 int my_spinlock_init(my_spinlock_t *lock)
 {
 	//can be allocated dynamically
-	lock->status = 0;
+	//simply initialize the lockstatus as 0
+	lock->lockstatus = 0;
 }
 
 int my_spinlock_destroy(my_spinlock_t *lock)
@@ -16,13 +17,17 @@ int my_spinlock_destroy(my_spinlock_t *lock)
 
 int my_spinlock_unlock(my_spinlock_t *lock)
 {
-	lock->status = 0;
+	//simply set the lockstatus back into 0 again
+	//so other threads can obtain the lock
+	lock->lockstatus = 0;
 }
 
 int my_spinlock_lockTAS(my_spinlock_t *lock)
-{
+{	
+	//tas() == 0 if the lock is free
+	//tas() != 0 if the lock is occupied
 	//keep looping until you get a lock
-	while(tas(&lock->status) != 0)
+	while(tas(&lock->lockstatus) != 0)
 	{
 
 	}
@@ -31,11 +36,13 @@ int my_spinlock_lockTAS(my_spinlock_t *lock)
 
 int my_spinlock_lockTTAS(my_spinlock_t *lock)
 {
+	//keep looping and see if the lock is free(lockstatus==0)
+	//if the lock is free then we do tas
 	while(1)
 	{
-		if(lock->status == 0)
+		if(lock->lockstatus == 0)
 		{
-			if(tas(&lock->status) == 0) break;
+			if(tas(&lock->lockstatus) == 0) break;
 		}
 	}
 	return 0;
@@ -47,9 +54,10 @@ int my_spinlock_trylock(my_spinlock_t *lock)
 {
 	//this is not blocking/waiting
 	//probably for recursion
-	//basically just check if the lock is free, if yes then return true and take the lock
+	//basically just check if the lock is free
+	//if yes then return true and take the lock
 	//if no just return false
-	return lock->status;
+	return lock->lockstatus;
 }
 
 

@@ -6,21 +6,21 @@
 
 struct my_spinlock_struct
 {
-	volatile long unsigned int status;
-	int value;
+	volatile long unsigned int lockstatus;
+	int lockvalue;
 };
 
 struct my_mutex_struct
 {
-	volatile long unsigned int status;
+	volatile long unsigned int lockstatus;
 	struct timespec wait;
 	int backoff;
-	int value;
+	int lockvalue;
 };
 
 struct my_queuelock_struct
 {
-	volatile long unsigned int status;
+	volatile long unsigned int lockstatus;
 	int myTicket;
 };
 
