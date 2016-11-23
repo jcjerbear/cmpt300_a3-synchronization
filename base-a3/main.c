@@ -128,37 +128,37 @@ void *myMutexTASTest()
 			localCount++;
 		}
 		
-		pthread_mutex_lock(&count_mutex);
+		my_mutex_lock(&count_mymutex);
 		for(k=0;k<workInsideCS;k++)/*How much work is done inside the CS*/
 		{
 			c++;
 		}
-		pthread_mutex_unlock(&count_mutex);    	
+		my_mutex_unlock(&count_mymutex);    	
     }
 }
 
-// void *myQueueTest()
-// {
-	// int i;
-	// int j;
-	// int k;
-	// int localCount = 0;
+void *myQueueTest()
+{
+	int i;
+	int j;
+	int k;
+	int localCount = 0;
 	
- //    for(i=0;i<numItterations;i++)
- //    {
-	// 	for(j=0;j<workOutsideCS;j++)/*How much work is done outside the CS*/
-	// 	{
-	// 		localCount++;
-	// 	}
+    for(i=0;i<numItterations;i++)
+    {
+		for(j=0;j<workOutsideCS;j++)/*How much work is done outside the CS*/
+		{
+			localCount++;
+		}
 	
-	// 	pthread_mutex_lock(&count_mutex);
-	// 	for(k=0;k<workInsideCS;k++)/*How much work is done inside the CS*/
-	// 	{
-	// 		c++;
-	// 	}
-	// 	pthread_mutex_unlock(&count_mutex);    	
- //    }   
-// }
+		my_queuelock_lock(&count_myqueue);
+		for(k=0;k<workInsideCS;k++)/*How much work is done inside the CS*/
+		{
+			c++;
+		}
+		my_queuelock_unlock(&count_myqueue);    	
+    }   
+}
 
 int runTest(int testID)
 {
@@ -192,7 +192,7 @@ int runTest(int testID)
 
 		printf("Threaded Run Pthread (Mutex) Total Count: %llu\n", c);
 		result=timespecDiff(&stop,&start);
-		printf("Pthread Mutex time(ms): %lld\n",result/1000000);
+		printf("Pthread Mutex time(ms): %lld\n",result/numItterations /*1000000*/);
 	}
 
 	if(testID == 0 || testID == 2) /*Pthread Spinlock*/
@@ -226,7 +226,7 @@ int runTest(int testID)
 
 		printf("Threaded Run Pthread (Spinlock) Total Count: %llu\n", c);
 		result=timespecDiff(&stop,&start);
-		printf("Pthread Spinlock time(ms): %lld\n",result/1000000);
+		printf("Pthread Spinlock time(ms): %lld\n",result/numItterations /*1000000*/);
 	}
 
 	// /*....you must implement the other tests....*/
@@ -261,7 +261,7 @@ int runTest(int testID)
 
 		printf("Threaded Run mySpinTAS Total Count: %llu\n", c);
 		result=timespecDiff(&stop,&start);
-		printf("mySpinTAS time(ms): %lld\n",result/1000000);
+		printf("mySpinTAS time(ms): %lld\n",result/numItterations /*1000000*/);
 	}
 
 	if(testID == 0 || testID == 4) /*mySpinLockTTAS*/
@@ -295,7 +295,7 @@ int runTest(int testID)
 
 		printf("Threaded Run mySpinTTAS Total Count: %llu\n", c);
 		result=timespecDiff(&stop,&start);
-		printf("mySpinTTAS time(ms): %lld\n",result/1000000);
+		printf("mySpinTTAS time(ms): %lld\n",result/numItterations /*1000000*/);
 	}
 
 	if(testID == 0 || testID == 5) /*myMutexTAS*/
@@ -305,6 +305,7 @@ int runTest(int testID)
 		struct timespec start;
 		struct timespec stop;
 		unsigned long long result; //64 bit integer
+		my_mutex_init(&count_mymutex);
 
 		pthread_t *threads = (pthread_t*)malloc(sizeof(pthread_t)*numThreads);	
 		int i;
@@ -328,42 +329,42 @@ int runTest(int testID)
 
 		printf("Threaded Run myMutexTAS Total Count: %llu\n", c);
 		result=timespecDiff(&stop,&start);
-		printf("myMutexTAS time(ms): %lld\n",result/1000000);
+		printf("myMutexTAS time(ms): %lld\n",result/numItterations /*1000000*/);
 	}
 
-	// if(testID == 0 || testID == 6) /*myQueueLock*/
-	// {
-	// 	/* myQueueLock goes here*/
-	// 	c=0;
-	// 	struct timespec start;
-	// 	struct timespec stop;
-	// 	unsigned long long result; //64 bit integer
+	if(testID == 0 || testID == 6) /*myQueueLock*/
+	{
+		/* myQueueLock goes here*/
+		c=0;
+		struct timespec start;
+		struct timespec stop;
+		unsigned long long result; //64 bit integer
+		my_queuelock_init(&count_myqueue);
 
-	// 	pthread_t *threads = (pthread_t*)malloc(sizeof(pthread_t)*numThreads);	
-	// 	int i;
-	// 	int rt;
+		pthread_t *threads = (pthread_t*)malloc(sizeof(pthread_t)*numThreads);	
+		int i;
+		int rt;
 
-	// 	clock_gettime(CLOCK_MONOTONIC, &start);
-	// 	for(i=0;i<numThreads;i++)
-	// 	{
-	// 		if( rt=(pthread_create(threads+i, NULL, &myQueueTest, NULL)) )
-	// 		{
-	// 			printf("Thread creation failed: %d\n", rt);
-	// 			return -1;	
-	// 		}
-	// 	}
+		clock_gettime(CLOCK_MONOTONIC, &start);
+		for(i=0;i<numThreads;i++)
+		{
+			if( rt=(pthread_create(threads+i, NULL, &myQueueTest, NULL)) )
+			{
+				printf("Thread creation failed: %d\n", rt);
+				return -1;	
+			}
+		}
 		
-	// 	for(i=0;i<numThreads;i++) //Wait for all threads to finish
-	// 	{
-	// 		 pthread_join(threads[i], NULL);
-	// 	}
-	// 	clock_gettime(CLOCK_MONOTONIC, &stop);
+		for(i=0;i<numThreads;i++) //Wait for all threads to finish
+		{
+			 pthread_join(threads[i], NULL);
+		}
+		clock_gettime(CLOCK_MONOTONIC, &stop);
 
-	// 	printf("Threaded Run myQueueLock Total Count: %llu\n", c);
-	// 	result=timespecDiff(&stop,&start);
-	// 	printf("myQueueLock time(ms): %lld\n",result/1000000);
-
-	// }
+		printf("Threaded Run myQueueLock Total Count: %llu\n", c);
+		result=timespecDiff(&stop,&start);
+		printf("myQueueLock time(ms): %lld\n",result/numItterations /*1000000*/);
+	}
 	return 0;
 }
 
@@ -386,7 +387,7 @@ int processInput(int argc, char *argv[])
 	workInsideCS=1;
 	
 	//if there is only 1 argument and with no input given then return 0 with default values
-	if(argc == 1 && argv[0] == "./mylocks")
+	if(argc==1)
 	{
 		printf("numThreads: %d\n", numThreads);
 		printf("numItterations: %d\n", numItterations);
@@ -397,11 +398,11 @@ int processInput(int argc, char *argv[])
 		return 0;
 	}
 	//if inputs are given then replace the values
-	for(int i=0;i<argc;i++)
+	for(int i=0;i<argc;++i)
 	{
 		if(strcmp(argv[i], "-t") == 0) numThreads = atoi(argv[i+1]);
 		else if(strcmp(argv[i], "-i") == 0) numItterations = atoi(argv[i+1]);
-		else if(strcmp(argv[i],"-o") == 0) workOutsideCS = atoi(argv[i+1]);
+		else if(strcmp(argv[i],  "-o") == 0) workOutsideCS = atoi(argv[i+1]);
 		else if(strcmp(argv[i], "-c") == 0) workInsideCS = atoi(argv[i+1]);
 		else if(strcmp(argv[i], "-d") == 0) testID = atoi(argv[i+1]);
 	}	
@@ -410,7 +411,7 @@ int processInput(int argc, char *argv[])
 	printf("numItterations: %d\n", numItterations);
 	printf("testID: %d\n", testID);
 	printf("workOutsideCS: %d\n", workOutsideCS);
-	printf("workInsideCS: %d\n", workOutsideCS);
+	printf("workInsideCS: %d\n", workInsideCS);
 	printf("\n");
 
 	return 0;

@@ -2,26 +2,34 @@
 #define _m_SYNC_H_
 
 #include <stdlib.h>
+#include <pthread.h>
+// #include <sys/types.h>
+// #include <linux/unistd.h>
+// #include <sys/syscall.h>
+#include <time.h>
+#include <unistd.h>
 #include "atomic_ops.h"
 
 struct my_spinlock_struct
 {
 	volatile long unsigned int lockstatus;
-	int lockvalue;
+	pthread_t tid;
+	int lockCount;
+	//int lockvalue;
 };
 
 struct my_mutex_struct
 {
+	struct timespec sleep;
 	volatile long unsigned int lockstatus;
-	struct timespec wait;
-	int backoff;
-	int lockvalue;
+	int expBackoff;
+	//int lockvalue;
 };
 
 struct my_queuelock_struct
 {
-	volatile long unsigned int lockstatus;
-	int myTicket;
+	volatile long unsigned int nowServing;
+	volatile long unsigned int nextTicket;
 };
 
 typedef struct my_spinlock_struct my_spinlock_t;

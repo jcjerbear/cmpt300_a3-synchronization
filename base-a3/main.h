@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 #include "sync.h"
 
 long long c = 0;

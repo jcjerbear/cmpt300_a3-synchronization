@@ -24,6 +24,8 @@ Average cost of 1 thread context switch:579.569050 nano seconds
 
 ./mylocks
 ./mylocks -t 4 -i 10000 -o 
+./mylocks -t 8 -i 1000000 -o 0 -c 1 -d 0
+
 
 4 Threads: 400-500 ms
 threads over 8, queue lock is super slow
