@@ -1,31 +1,31 @@
-readme.txt
-========================================================================
-Question1:
-1)compile hr-timer.c with "gcc -std=gnu99 hr-timer.c" command in the terminal
-2)run a.out executable with "./a.out" command in the terminal
-3)"make clean" command if compiled files need to be removed
-P.S. for comments on Q1 please refer to hr-timer.c
-========================================================================
-
-========================================================================
-Question2-5:
+readme
 1)compile main.c with "make" command in the terminal
-2)run executable with "make run" command in the terminal
+2)run executable with "make run" command in the terminal for default input values
 3)"make clean" command if compiled files need to be removed
-========================================================================
+4)for further testing:
+	Usage of: ./mylocks -t #threads -i #Itterations -o #OperationsOutsideCS -c #OperationsInsideCS -d testid
+	testid: 0=all, 1=pthreadMutex, 2=pthreadSpinlock, 3=mySpinLockTAS, 4=mySpinLockTTAS, 5=myMutexTAS, 6=myQueueLock
+5)further testing example:
+	./mylocks -t 8 -i 1000000 -o 0 -c 1 -d 0
 
-========================================================================
-Measurements:
-Average cost of minimal funcCall minus forloop overhead:0.829867 nano seconds
-Average cost of minimal sysCall minus forloop overhead:0.908742 nano seconds
-Average cost of 1 process context switch:899.692120 nano seconds
-Average cost of 1 thread context switch:579.569050 nano seconds
-========================================================================
+6)measurements:
+	(with default input values)
 
-./mylocks
-./mylocks -t 4 -i 10000 -o 
-./mylocks -t 8 -i 1000000 -o 0 -c 1 -d 0
+	numThreads: 4
+	numItterations: 1000000
+	testID: 0
+	workOutsideCS: 0
+	workInsideCS: 1
 
-
-4 Threads: 400-500 ms
-threads over 8, queue lock is super slow
+	Threaded Run Pthread (Mutex) Total Count: 4000000
+	Pthread Mutex time(ms): 896
+	Threaded Run Pthread (Spinlock) Total Count: 4000000
+	Pthread Spinlock time(ms): 253
+	Threaded Run mySpinTAS Total Count: 4000000
+	mySpinTAS time(ms): 859
+	Threaded Run mySpinTTAS Total Count: 4000000
+	mySpinTTAS time(ms): 487
+	Threaded Run myMutexTAS Total Count: 4000000
+	myMutexTAS time(ms): 171
+	Threaded Run myQueueLock Total Count: 4000000
+	myQueueLock time(ms): 533

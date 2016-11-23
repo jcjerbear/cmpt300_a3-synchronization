@@ -114,7 +114,7 @@ void *mySpinTTASTest()
     }   
 }
 
-void *myMutexTASTest()
+void *myMutexTTASTest()
 {
 	int i;
 	int j;
@@ -314,7 +314,7 @@ int runTest(int testID)
 		clock_gettime(CLOCK_MONOTONIC, &start);
 		for(i=0;i<numThreads;i++)
 		{
-			if( rt=(pthread_create(threads+i, NULL, &myMutexTASTest, NULL)) )
+			if( rt=(pthread_create(threads+i, NULL, &myMutexTTASTest, NULL)) )
 			{
 				printf("Thread creation failed: %d\n", rt);
 				return -1;	
